@@ -35,24 +35,23 @@ public class MainActivity extends AppCompatActivity implements RadioPlayer.Liste
         streamUri = Uri.parse(STREAM_URL);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setEnabled(false);
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (player.getPlayerControl().isPlaying()) {
                     player.getPlayerControl().pause();
-                    //playerNeedsPrepare = true;
-                }
-                else {
-                    if (!maybeRequestPermission()) {
-                        player.seekTo(0);
-                        player.getPlayerControl().start();
-                        //preparePlayer(true);
-                    }
+                } else {
+                    player.seekTo(0); //Advance to live edge
+                    player.getPlayerControl().start();
                 }
             }
         });
 
-        preparePlayer(false);
+        if (!maybeRequestPermission()) { //Not necessary, just in case URI is local file, ask for permissions
+            preparePlayer(false);
+        }
     }
 
 
@@ -136,12 +135,11 @@ public class MainActivity extends AppCompatActivity implements RadioPlayer.Liste
                 fab.setImageResource(android.R.drawable.ic_media_ff);
                 break;
             case ExoPlayer.STATE_ENDED:
-                fab.setImageResource(android.R.drawable.ic_media_pause);
                 break;
             case ExoPlayer.STATE_IDLE:
                 break;
             case ExoPlayer.STATE_PREPARING:
-                fab.setImageResource(android.R.drawable.ic_media_rew);
+                fab.setEnabled(true);
                 break;
             case ExoPlayer.STATE_READY:
                 if (playWhenReady) {
